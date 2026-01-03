@@ -6,7 +6,7 @@ Param(
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$converter = Join-Path $projectRoot 'app' 'local_image_converter.py'
+$converter = Join-Path (Join-Path $projectRoot 'app') 'local_image_converter.py'
 
 $python = Get-Command pythonw.exe -ErrorAction SilentlyContinue
 if (-not $python) {
@@ -22,4 +22,11 @@ if (-not (Test-Path $converter)) {
 }
 
 # Launch the converter using a GUI-friendly interpreter when available.
-& $python.Source "$converter" "$SourcePath"
+try {
+    Write-Host "Launching: $($python.Source) $converter $SourcePath"
+    & $python.Source "$converter" "$SourcePath"
+    Write-Host "Converter execution completed"
+} catch {
+    Write-Host "Error: $_"
+    Read-Host "Press Enter to continue"
+}
